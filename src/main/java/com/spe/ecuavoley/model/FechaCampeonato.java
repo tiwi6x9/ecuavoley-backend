@@ -13,9 +13,7 @@ public class FechaCampeonato {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "campeonato_id",
-            nullable = false)
+    @JoinColumn(name = "campeonato_id", nullable = false)
     private Campeonato campeonato;
 
     @Column(nullable = false)
@@ -23,6 +21,9 @@ public class FechaCampeonato {
 
     @Column(nullable = false)
     private LocalDate fecha;
+
+    @Column(length = 50)
+    private String fase;
 
     public FechaCampeonato() {
     }
@@ -53,5 +54,13 @@ public class FechaCampeonato {
 
     public void setFecha(LocalDate fecha) {
         this.fecha = fecha;
+    }
+
+    public String getFase() {
+        return fase;
+    }
+
+    public void setFase(String fase) {
+        this.fase = fase;
     }
 }

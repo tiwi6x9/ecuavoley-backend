@@ -22,6 +22,7 @@ public class ProximoPartidoResponse {
     private String equipoB;
 
     private String canchaNombre;
+    private String fase;
 
     public ProximoPartidoResponse() {
     }
@@ -120,5 +121,13 @@ public class ProximoPartidoResponse {
             String canchaNombre) {
 
         this.canchaNombre = canchaNombre;
+    }
+
+    public String getFase() {
+        return fase;
+    }
+
+    public void setFase(String fase) {
+        this.fase = fase;
     }
 }

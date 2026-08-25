@@ -25,7 +25,6 @@ import com.spe.ecuavoley.dto.ProximoPartidoResponse;
 import com.spe.ecuavoley.dto.ResultadoPartidoResponse;
 import com.spe.ecuavoley.mapper.PartidoMapper;
 
-
 import java.util.List;
 
 @Service
@@ -336,10 +335,11 @@ public class PartidoService {
                                                         .getFechaCampeonato()
                                                         .getNumero());
 
-                        response.setFecha(
+                        response.setFase(
                                         partido
                                                         .getFechaCampeonato()
-                                                        .getFecha());
+                                                        .getFase());
+
                 }
 
                 if (partido.getEquipoAEntidad() != null) {
