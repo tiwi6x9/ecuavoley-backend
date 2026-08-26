@@ -7,12 +7,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.spe.ecuavoley.model.SerieEquipo;
 
 public interface SerieEquipoRepository
-        extends JpaRepository<SerieEquipo, Long> {
+                extends JpaRepository<SerieEquipo, Long> {
 
-    List<SerieEquipo> findBySerieId(
-            Long serieId);
+        List<SerieEquipo> findBySerieId(
+                        Long serieId);
 
-    boolean existsBySerieIdAndEquipoId(
-            Long serieId,
-            Long equipoId);
+        boolean existsBySerieIdAndEquipoId(
+                        Long serieId,
+                        Long equipoId);
+
+        List<SerieEquipo> findBySerieCampeonatoId(
+                        Long campeonatoId);
 }

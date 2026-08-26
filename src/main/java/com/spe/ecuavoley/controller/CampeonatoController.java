@@ -1,5 +1,6 @@
 package com.spe.ecuavoley.controller;
 
+import com.spe.ecuavoley.dto.EquipoCampeonatoResponse;
 import com.spe.ecuavoley.dto.JugadorEquipoResponse;
 import com.spe.ecuavoley.model.Campeonato;
 import com.spe.ecuavoley.service.CampeonatoService;
@@ -45,5 +46,14 @@ public class CampeonatoController {
                 campeonatoService.obtenerJugadoresEquipo(
                         campeonatoId,
                         equipoId));
+    }
+
+    @GetMapping("/{campeonatoId}/equipos")
+    public ResponseEntity<List<EquipoCampeonatoResponse>> obtenerEquiposCampeonato(
+            @PathVariable Long campeonatoId) {
+
+        return ResponseEntity.ok(
+                campeonatoService.obtenerEquiposCampeonato(
+                        campeonatoId));
     }
 }

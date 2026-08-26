@@ -1,9 +1,11 @@
 package com.spe.ecuavoley.service;
 
+import com.spe.ecuavoley.dto.EquipoCampeonatoResponse;
 import com.spe.ecuavoley.dto.JugadorEquipoResponse;
 import com.spe.ecuavoley.model.Campeonato;
 import com.spe.ecuavoley.repository.CampeonatoRepository;
 import com.spe.ecuavoley.repository.EquipoJugadorRepository;
+import com.spe.ecuavoley.repository.SerieEquipoRepository;
 
 import org.springframework.stereotype.Service;
 
@@ -15,12 +17,15 @@ public class CampeonatoService {
 
     private final CampeonatoRepository campeonatoRepository;
     private final EquipoJugadorRepository equipoJugadorRepository;
+    private final SerieEquipoRepository serieEquipoRepository;
 
     public CampeonatoService(
             CampeonatoRepository campeonatoRepository,
-            EquipoJugadorRepository equipoJugadorRepository) {
+            EquipoJugadorRepository equipoJugadorRepository,
+            SerieEquipoRepository serieEquipoRepository) {
         this.campeonatoRepository = campeonatoRepository;
         this.equipoJugadorRepository = equipoJugadorRepository;
+        this.serieEquipoRepository = serieEquipoRepository;
     }
 
     public List<Campeonato> obtenerTodos() {
@@ -49,6 +54,21 @@ public class CampeonatoService {
                             jugador.getNombre(),
                             jugador.getFotoUrl());
                 })
+                .toList();
+    }
+
+    public List<EquipoCampeonatoResponse> obtenerEquiposCampeonato(
+            Long campeonatoId) {
+
+        return serieEquipoRepository
+                .findBySerieCampeonatoId(campeonatoId)
+                .stream()
+                .map(serieEquipo -> serieEquipo.getEquipo())
+                .distinct()
+                .map(equipo -> new EquipoCampeonatoResponse(
+                        equipo.getId(),
+                        equipo.getNombre(),
+                        equipo.getLogoUrl()))
                 .toList();
     }
 }
