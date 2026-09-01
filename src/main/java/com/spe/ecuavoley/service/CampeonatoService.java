@@ -52,7 +52,8 @@ public class CampeonatoService {
                     return new JugadorEquipoResponse(
                             jugador.getId(),
                             jugador.getNombre(),
-                            jugador.getFotoUrl());
+                            jugador.getFotoUrl(),
+                            jugador.getPosicion());
                 })
                 .toList();
     }
@@ -65,10 +66,19 @@ public class CampeonatoService {
                 .stream()
                 .map(serieEquipo -> serieEquipo.getEquipo())
                 .distinct()
-                .map(equipo -> new EquipoCampeonatoResponse(
-                        equipo.getId(),
-                        equipo.getNombre(),
-                        equipo.getLogoUrl()))
+                .map(equipo -> {
+
+                    var dirigente = equipo.getDirigente();
+
+                    return new EquipoCampeonatoResponse(
+                            equipo.getId(),
+                            equipo.getNombre(),
+                            equipo.getLogoUrl(),
+                            dirigente != null ? dirigente.getId() : null,
+                            dirigente != null ? dirigente.getNombre() : null,
+                            dirigente != null ? dirigente.getTelefono() : null,
+                            dirigente != null ? dirigente.getFotoUrl() : null);
+                })
                 .toList();
     }
 }

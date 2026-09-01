@@ -6,17 +6,31 @@ public class EquipoCampeonatoResponse {
     private String nombre;
     private String logoUrl;
 
+    private Long dirigenteId;
+    private String dirigenteNombre;
+    private String dirigenteTelefono;
+    private String dirigenteFotoUrl;
+
     public EquipoCampeonatoResponse() {
     }
 
     public EquipoCampeonatoResponse(
             Long id,
             String nombre,
-            String logoUrl) {
+            String logoUrl,
+            Long dirigenteId,
+            String dirigenteNombre,
+            String dirigenteTelefono,
+            String dirigenteFotoUrl) {
 
         this.id = id;
         this.nombre = nombre;
         this.logoUrl = logoUrl;
+
+        this.dirigenteId = dirigenteId;
+        this.dirigenteNombre = dirigenteNombre;
+        this.dirigenteTelefono = dirigenteTelefono;
+        this.dirigenteFotoUrl = dirigenteFotoUrl;
     }
 
     public Long getId() {
@@ -29,5 +43,21 @@ public class EquipoCampeonatoResponse {
 
     public String getLogoUrl() {
         return logoUrl;
+    }
+
+    public Long getDirigenteId() {
+        return dirigenteId;
+    }
+
+    public String getDirigenteNombre() {
+        return dirigenteNombre;
+    }
+
+    public String getDirigenteTelefono() {
+        return dirigenteTelefono;
+    }
+
+    public String getDirigenteFotoUrl() {
+        return dirigenteFotoUrl;
     }
 }

@@ -5,6 +5,7 @@ public class JugadorEquipoResponse {
     private Long id;
     private String nombre;
     private String fotoUrl;
+    private String posicion;
 
     public JugadorEquipoResponse() {
     }
@@ -12,11 +13,13 @@ public class JugadorEquipoResponse {
     public JugadorEquipoResponse(
             Long id,
             String nombre,
-            String fotoUrl) {
+            String fotoUrl,
+            String posicion) {
 
         this.id = id;
         this.nombre = nombre;
         this.fotoUrl = fotoUrl;
+        this.posicion = posicion;
     }
 
     public Long getId() {
@@ -41,5 +44,13 @@ public class JugadorEquipoResponse {
 
     public void setFotoUrl(String fotoUrl) {
         this.fotoUrl = fotoUrl;
+    }
+
+    public String getPosicion() {
+        return posicion;
+    }
+
+    public void setPosicion(String posicion) {
+        this.posicion = posicion;
     }
 }

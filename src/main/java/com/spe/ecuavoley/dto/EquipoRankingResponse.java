@@ -17,6 +17,11 @@ public class EquipoRankingResponse {
 
     private String logoUrl;
 
+    private Long dirigenteId;
+    private String dirigenteNombre;
+    private String dirigenteTelefono;
+    private String dirigenteFotoUrl;
+
     public String getLogoUrl() {
         return logoUrl;
     }
@@ -100,5 +105,37 @@ public class EquipoRankingResponse {
 
     public void setPuntaje(long puntaje) {
         this.puntaje = puntaje;
+    }
+
+    public Long getDirigenteId() {
+        return dirigenteId;
+    }
+
+    public void setDirigenteId(Long dirigenteId) {
+        this.dirigenteId = dirigenteId;
+    }
+
+    public String getDirigenteNombre() {
+        return dirigenteNombre;
+    }
+
+    public void setDirigenteNombre(String dirigenteNombre) {
+        this.dirigenteNombre = dirigenteNombre;
+    }
+
+    public String getDirigenteTelefono() {
+        return dirigenteTelefono;
+    }
+
+    public void setDirigenteTelefono(String dirigenteTelefono) {
+        this.dirigenteTelefono = dirigenteTelefono;
+    }
+
+    public String getDirigenteFotoUrl() {
+        return dirigenteFotoUrl;
+    }
+
+    public void setDirigenteFotoUrl(String dirigenteFotoUrl) {
+        this.dirigenteFotoUrl = dirigenteFotoUrl;
     }
 }

@@ -16,6 +16,10 @@ public class Equipo {
     @Column(name = "logo_url")
     private String logoUrl;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dirigente_id")
+    private Dirigente dirigente;
+
     public Equipo() {
     }
 
@@ -37,5 +41,13 @@ public class Equipo {
 
     public void setLogoUrl(String logoUrl) {
         this.logoUrl = logoUrl;
+    }
+
+    public Dirigente getDirigente() {
+        return dirigente;
+    }
+
+    public void setDirigente(Dirigente dirigente) {
+        this.dirigente = dirigente;
     }
 }

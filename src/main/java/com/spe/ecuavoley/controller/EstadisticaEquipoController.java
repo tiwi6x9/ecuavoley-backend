@@ -14,52 +14,53 @@ import com.spe.ecuavoley.service.EstadisticaEquipoService;
 @RequestMapping("/api/estadisticas/equipos")
 public class EstadisticaEquipoController {
 
-    private final EstadisticaEquipoService estadisticaEquipoService;
+        private final EstadisticaEquipoService estadisticaEquipoService;
 
-    public EstadisticaEquipoController(
-            EstadisticaEquipoService estadisticaEquipoService) {
+        public EstadisticaEquipoController(
+                        EstadisticaEquipoService estadisticaEquipoService) {
 
-        this.estadisticaEquipoService = estadisticaEquipoService;
-    }
+                this.estadisticaEquipoService = estadisticaEquipoService;
+        }
 
-    @GetMapping("/{equipoId}")
-    public ResponseEntity<EquipoEstadisticaResponse> obtenerEstadisticas(
-            @PathVariable Long equipoId) {
+        @GetMapping("/{equipoId}")
+        public ResponseEntity<EquipoEstadisticaResponse> obtenerEstadisticas(
+                        @PathVariable Long equipoId) {
 
-        return estadisticaEquipoService
-                .obtenerEstadisticas(equipoId)
-                .map(ResponseEntity::ok)
-                .orElseGet(
-                        () -> ResponseEntity
-                                .notFound()
-                                .build());
-    }
+                return estadisticaEquipoService
+                                .obtenerEstadisticas(equipoId)
+                                .map(ResponseEntity::ok)
+                                .orElseGet(
+                                                () -> ResponseEntity
+                                                                .notFound()
+                                                                .build());
+        }
 
-    @GetMapping("/ranking")
-    public ResponseEntity<List<EquipoRankingResponse>> obtenerRanking() {
+        @GetMapping("/ranking")
+        public ResponseEntity<List<EquipoRankingResponse>> obtenerRanking() {
 
-        return ResponseEntity.ok(
-                estadisticaEquipoService
-                        .obtenerRanking());
-    }
+                return ResponseEntity.ok(
+                                estadisticaEquipoService
+                                                .obtenerRanking());
+        }
 
-    @GetMapping("/{equipoId}/historial")
-    public ResponseEntity<List<PartidoHistorialEquipoResponse>> obtenerHistorial(
-            @PathVariable Long equipoId) {
+        @GetMapping("/{equipoId}/historial")
+        public ResponseEntity<List<PartidoHistorialEquipoResponse>> obtenerHistorial(
+                        @PathVariable Long equipoId) {
 
-        return ResponseEntity.ok(
-                estadisticaEquipoService
-                        .obtenerHistorial(
-                                equipoId));
-    }
+                return ResponseEntity.ok(
+                                estadisticaEquipoService
+                                                .obtenerHistorial(
+                                                                equipoId));
+        }
 
-    @GetMapping("/campeonato/{campeonatoId}/ranking")
-    public ResponseEntity<List<EquipoRankingResponse>> obtenerRankingPorCampeonato(
-            @PathVariable Long campeonatoId) {
+        @GetMapping("/campeonato/{campeonatoId}/ranking")
+        public ResponseEntity<List<EquipoRankingResponse>> obtenerRankingPorCampeonato(
+                        @PathVariable Long campeonatoId) {
 
-        return ResponseEntity.ok(
-                estadisticaEquipoService
-                        .obtenerRankingPorCampeonato(
-                                campeonatoId));
-    }
+                return ResponseEntity.ok(
+                                estadisticaEquipoService
+                                                .obtenerRankingPorCampeonato(
+                                                                campeonatoId));
+        }
+
 }

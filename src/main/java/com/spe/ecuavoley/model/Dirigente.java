@@ -3,8 +3,8 @@ package com.spe.ecuavoley.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "jugadores")
-public class Jugador {
+@Table(name = "dirigentes")
+public class Dirigente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,15 +13,12 @@ public class Jugador {
     @Column(nullable = false)
     private String nombre;
 
-    private String apodo;
+    private String telefono;
 
     @Column(name = "foto_url")
     private String fotoUrl;
 
-    @Column(name = "posicion")
-    private String posicion;
-
-    public Jugador() {
+    public Dirigente() {
     }
 
     public Long getId() {
@@ -36,12 +33,12 @@ public class Jugador {
         this.nombre = nombre;
     }
 
-    public String getApodo() {
-        return apodo;
+    public String getTelefono() {
+        return telefono;
     }
 
-    public void setApodo(String apodo) {
-        this.apodo = apodo;
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
     }
 
     public String getFotoUrl() {
@@ -50,13 +47,5 @@ public class Jugador {
 
     public void setFotoUrl(String fotoUrl) {
         this.fotoUrl = fotoUrl;
-    }
-
-    public String getPosicion() {
-        return posicion;
-    }
-
-    public void setPosicion(String posicion) {
-        this.posicion = posicion;
     }
 }

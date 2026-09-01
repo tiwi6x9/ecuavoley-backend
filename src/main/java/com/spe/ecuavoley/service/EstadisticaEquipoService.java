@@ -3,6 +3,7 @@ package com.spe.ecuavoley.service;
 import java.util.List;
 import java.util.Optional;
 import java.util.Comparator;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -17,360 +18,344 @@ import com.spe.ecuavoley.repository.PartidoRepository;
 @Service
 public class EstadisticaEquipoService {
 
-    private final EquipoRepository equipoRepository;
-    private final PartidoRepository partidoRepository;
+        private final EquipoRepository equipoRepository;
+        private final PartidoRepository partidoRepository;
 
-    public EstadisticaEquipoService(
-            EquipoRepository equipoRepository,
-            PartidoRepository partidoRepository) {
+        public EstadisticaEquipoService(
+                        EquipoRepository equipoRepository,
+                        PartidoRepository partidoRepository) {
 
-        this.equipoRepository = equipoRepository;
-        this.partidoRepository = partidoRepository;
-    }
-
-    public Optional<EquipoEstadisticaResponse> obtenerEstadisticas(Long equipoId) {
-
-        Optional<Equipo> equipoOpt = equipoRepository.findById(equipoId);
-
-        if (equipoOpt.isEmpty()) {
-            return Optional.empty();
+                this.equipoRepository = equipoRepository;
+                this.partidoRepository = partidoRepository;
         }
 
-        Equipo equipo = equipoOpt.get();
+        public Optional<EquipoEstadisticaResponse> obtenerEstadisticas(Long equipoId) {
 
-        List<Partido> partidos = partidoRepository
-                .findPartidosFinalizadosByEquipoId(
-                        equipoId);
+                Optional<Equipo> equipoOpt = equipoRepository.findById(equipoId);
 
-        long jugados = partidos.size();
+                if (equipoOpt.isEmpty()) {
+                        return Optional.empty();
+                }
 
-        long ganados = 0;
-        long perdidos = 0;
+                Equipo equipo = equipoOpt.get();
 
-        long setsGanados = 0;
-        long setsPerdidos = 0;
+                List<Partido> partidos = partidoRepository
+                                .findPartidosFinalizadosByEquipoId(
+                                                equipoId);
 
-        for (Partido partido : partidos) {
+                long jugados = partidos.size();
 
-            boolean esEquipoA = partido.getEquipoAEntidad()
-                    .getId()
-                    .equals(equipoId);
+                long ganados = 0;
+                long perdidos = 0;
 
-            if (esEquipoA) {
+                long setsGanados = 0;
+                long setsPerdidos = 0;
 
-                setsGanados += partido.getSetsA();
-                setsPerdidos += partido.getSetsB();
+                for (Partido partido : partidos) {
 
-            } else {
+                        boolean esEquipoA = partido.getEquipoAEntidad()
+                                        .getId()
+                                        .equals(equipoId);
 
-                setsGanados += partido.getSetsB();
-                setsPerdidos += partido.getSetsA();
-            }
+                        if (esEquipoA) {
 
-            if (partido.getEquipoGanador() == null) {
-                continue;
-            }
+                                setsGanados += partido.getSetsA();
+                                setsPerdidos += partido.getSetsB();
 
-            if (partido
-                    .getEquipoGanador()
-                    .getId()
-                    .equals(equipoId)) {
+                        } else {
 
-                ganados++;
+                                setsGanados += partido.getSetsB();
+                                setsPerdidos += partido.getSetsA();
+                        }
 
-            } else {
+                        if (partido.getEquipoGanador() == null) {
+                                continue;
+                        }
 
-                perdidos++;
-            }
+                        if (partido
+                                        .getEquipoGanador()
+                                        .getId()
+                                        .equals(equipoId)) {
+
+                                ganados++;
+
+                        } else {
+
+                                perdidos++;
+                        }
+                }
+
+                double porcentaje = jugados == 0
+                                ? 0
+                                : (ganados * 100.0) / jugados;
+
+                EquipoEstadisticaResponse response = new EquipoEstadisticaResponse();
+
+                response.setEquipoId(equipo.getId());
+                response.setNombre(equipo.getNombre());
+
+                response.setPartidosJugados(jugados);
+                response.setPartidosGanados(ganados);
+                response.setPartidosPerdidos(perdidos);
+
+                response.setSetsGanados(setsGanados);
+                response.setSetsPerdidos(setsPerdidos);
+                response.setLogoUrl(equipo.getLogoUrl());
+
+                response.setPorcentajeVictorias(
+                                Math.round(porcentaje * 100.0)
+                                                / 100.0);
+
+                return Optional.of(response);
         }
 
-        double porcentaje = jugados == 0
-                ? 0
-                : (ganados * 100.0) / jugados;
+        public List<EquipoRankingResponse> obtenerRanking() {
 
-        EquipoEstadisticaResponse response = new EquipoEstadisticaResponse();
+                return equipoRepository.findAll()
+                                .stream()
+                                .map(equipo -> {
 
-        response.setEquipoId(equipo.getId());
-        response.setNombre(equipo.getNombre());
+                                        EquipoEstadisticaResponse estadistica = obtenerEstadisticas(
+                                                        equipo.getId())
+                                                        .orElseThrow();
 
-        response.setPartidosJugados(jugados);
-        response.setPartidosGanados(ganados);
-        response.setPartidosPerdidos(perdidos);
+                                        EquipoRankingResponse ranking = new EquipoRankingResponse();
 
-        response.setSetsGanados(setsGanados);
-        response.setSetsPerdidos(setsPerdidos);
-        response.setLogoUrl(equipo.getLogoUrl());
+                                        ranking.setEquipoId(estadistica.getEquipoId());
+                                        ranking.setNombre(estadistica.getNombre());
+                                        ranking.setPartidosJugados(estadistica.getPartidosJugados());
+                                        ranking.setPartidosGanados(estadistica.getPartidosGanados());
+                                        ranking.setPartidosPerdidos(estadistica.getPartidosPerdidos());
+                                        ranking.setSetsGanados(estadistica.getSetsGanados());
+                                        ranking.setSetsPerdidos(estadistica.getSetsPerdidos());
+                                        ranking.setPorcentajeVictorias(estadistica.getPorcentajeVictorias());
+                                        ranking.setLogoUrl(estadistica.getLogoUrl());
 
-        response.setPorcentajeVictorias(
-                Math.round(porcentaje * 100.0)
-                        / 100.0);
+                                        // === NUEVO: dirigente ===
+                                        var dirigente = equipo.getDirigente();
+                                        if (dirigente != null) {
+                                                ranking.setDirigenteId(dirigente.getId());
+                                                ranking.setDirigenteNombre(dirigente.getNombre());
+                                                ranking.setDirigenteTelefono(dirigente.getTelefono());
+                                                ranking.setDirigenteFotoUrl(dirigente.getFotoUrl());
+                                        }
 
-        return Optional.of(response);
-    }
+                                        long puntaje = estadistica.getPartidosGanados() * 3;
+                                        ranking.setPuntaje(puntaje);
 
-    public List<EquipoRankingResponse> obtenerRanking() {
-
-        return equipoRepository.findAll()
-                .stream()
-                .map(equipo -> {
-
-                    EquipoEstadisticaResponse estadistica = obtenerEstadisticas(
-                            equipo.getId())
-                            .orElseThrow();
-
-                    EquipoRankingResponse ranking = new EquipoRankingResponse();
-
-                    ranking.setEquipoId(
-                            estadistica.getEquipoId());
-
-                    ranking.setNombre(
-                            estadistica.getNombre());
-
-                    ranking.setPartidosJugados(
-                            estadistica.getPartidosJugados());
-
-                    ranking.setPartidosGanados(
-                            estadistica.getPartidosGanados());
-
-                    ranking.setPartidosPerdidos(
-                            estadistica.getPartidosPerdidos());
-
-                    ranking.setSetsGanados(
-                            estadistica.getSetsGanados());
-
-                    ranking.setSetsPerdidos(
-                            estadistica.getSetsPerdidos());
-
-                    ranking.setPorcentajeVictorias(
-                            estadistica.getPorcentajeVictorias());
-
-                    ranking.setLogoUrl(
-                            estadistica.getLogoUrl());
-
-                    long puntaje = estadistica.getPartidosGanados() * 3;
-
-                    ranking.setPuntaje(puntaje);
-
-                    return ranking;
-                })
-                .sorted(
-                        Comparator
-                                .comparingLong(
-                                        EquipoRankingResponse::getPuntaje)
-                                .reversed()
-                                .thenComparing(
-                                        Comparator.comparingLong(
-                                                EquipoRankingResponse::getSetsGanados)
-                                                .reversed())
-                                .thenComparing(
-                                        Comparator.comparingDouble(
-                                                EquipoRankingResponse::getPorcentajeVictorias)
-                                                .reversed()))
-                .toList();
-    }
-
-    public List<PartidoHistorialEquipoResponse> obtenerHistorial(Long equipoId) {
-
-        return partidoRepository
-                .findPartidosFinalizadosByEquipoId(equipoId)
-                .stream()
-                .map(partido -> {
-
-                    boolean esEquipoA = partido.getEquipoAEntidad()
-                            .getId()
-                            .equals(equipoId);
-
-                    PartidoHistorialEquipoResponse response = new PartidoHistorialEquipoResponse();
-
-                    response.setPartidoId(
-                            partido.getId());
-
-                    if (esEquipoA) {
-
-                        response.setEquipo(
-                                partido.getEquipoA());
-
-                        response.setRival(
-                                partido.getEquipoB());
-
-                        response.setSetsEquipo(
-                                partido.getSetsA());
-
-                        response.setSetsRival(
-                                partido.getSetsB());
-
-                    } else {
-
-                        response.setEquipo(
-                                partido.getEquipoB());
-
-                        response.setRival(
-                                partido.getEquipoA());
-
-                        response.setSetsEquipo(
-                                partido.getSetsB());
-
-                        response.setSetsRival(
-                                partido.getSetsA());
-                    }
-
-                    if (partido.getEquipoGanador() == null) {
-
-                        response.setResultado(
-                                "SIN RESULTADO");
-
-                    } else if (partido.getEquipoGanador()
-                            .getId()
-                            .equals(equipoId)) {
-
-                        response.setResultado(
-                                "VICTORIA");
-
-                    } else {
-
-                        response.setResultado(
-                                "DERROTA");
-                    }
-
-                    response.setFecha(
-                            partido.getFechaActualizacion());
-
-                    return response;
-                })
-                .toList();
-    }
-
-    public Optional<EquipoEstadisticaResponse> obtenerEstadisticasPorCampeonato(
-            Long equipoId,
-            Long campeonatoId) {
-
-        Optional<Equipo> equipoOpt = equipoRepository.findById(equipoId);
-
-        if (equipoOpt.isEmpty()) {
-            return Optional.empty();
+                                        return ranking;
+                                })
+                                .sorted(
+                                                Comparator
+                                                                .comparingLong(EquipoRankingResponse::getPuntaje)
+                                                                .reversed()
+                                                                .thenComparing(
+                                                                                Comparator.comparingLong(
+                                                                                                EquipoRankingResponse::getSetsGanados)
+                                                                                                .reversed())
+                                                                .thenComparing(
+                                                                                Comparator.comparingDouble(
+                                                                                                EquipoRankingResponse::getPorcentajeVictorias)
+                                                                                                .reversed()))
+                                .toList();
         }
 
-        Equipo equipo = equipoOpt.get();
+        public List<PartidoHistorialEquipoResponse> obtenerHistorial(Long equipoId) {
 
-        List<Partido> partidos = partidoRepository
-                .findPartidosFinalizadosByEquipoIdAndCampeonatoId(
-                        equipoId,
-                        campeonatoId);
+                return partidoRepository
+                                .findPartidosFinalizadosByEquipoId(equipoId)
+                                .stream()
+                                .map(partido -> {
 
-        long jugados = partidos.size();
+                                        boolean esEquipoA = partido.getEquipoAEntidad()
+                                                        .getId()
+                                                        .equals(equipoId);
 
-        long ganados = 0;
-        long perdidos = 0;
+                                        PartidoHistorialEquipoResponse response = new PartidoHistorialEquipoResponse();
 
-        long setsGanados = 0;
-        long setsPerdidos = 0;
+                                        response.setPartidoId(
+                                                        partido.getId());
 
-        for (Partido partido : partidos) {
+                                        if (esEquipoA) {
 
-            boolean esEquipoA = partido.getEquipoAEntidad()
-                    .getId()
-                    .equals(equipoId);
+                                                response.setEquipo(
+                                                                partido.getEquipoA());
 
-            if (esEquipoA) {
-                setsGanados += partido.getSetsA();
-                setsPerdidos += partido.getSetsB();
-            } else {
-                setsGanados += partido.getSetsB();
-                setsPerdidos += partido.getSetsA();
-            }
+                                                response.setRival(
+                                                                partido.getEquipoB());
 
-            if (partido.getEquipoGanador() == null) {
-                continue;
-            }
+                                                response.setSetsEquipo(
+                                                                partido.getSetsA());
 
-            if (partido.getEquipoGanador()
-                    .getId()
-                    .equals(equipoId)) {
+                                                response.setSetsRival(
+                                                                partido.getSetsB());
 
-                ganados++;
-            } else {
-                perdidos++;
-            }
+                                        } else {
+
+                                                response.setEquipo(
+                                                                partido.getEquipoB());
+
+                                                response.setRival(
+                                                                partido.getEquipoA());
+
+                                                response.setSetsEquipo(
+                                                                partido.getSetsB());
+
+                                                response.setSetsRival(
+                                                                partido.getSetsA());
+                                        }
+
+                                        if (partido.getEquipoGanador() == null) {
+
+                                                response.setResultado(
+                                                                "SIN RESULTADO");
+
+                                        } else if (partido.getEquipoGanador()
+                                                        .getId()
+                                                        .equals(equipoId)) {
+
+                                                response.setResultado(
+                                                                "VICTORIA");
+
+                                        } else {
+
+                                                response.setResultado(
+                                                                "DERROTA");
+                                        }
+
+                                        response.setFecha(
+                                                        partido.getFechaActualizacion());
+
+                                        return response;
+                                })
+                                .toList();
         }
 
-        double porcentaje = jugados == 0
-                ? 0
-                : (ganados * 100.0) / jugados;
+        public Optional<EquipoEstadisticaResponse> obtenerEstadisticasPorCampeonato(
+                        Long equipoId,
+                        Long campeonatoId) {
 
-        EquipoEstadisticaResponse response = new EquipoEstadisticaResponse();
+                Optional<Equipo> equipoOpt = equipoRepository.findById(equipoId);
 
-        response.setEquipoId(equipo.getId());
-        response.setNombre(equipo.getNombre());
-        response.setLogoUrl(equipo.getLogoUrl());
+                if (equipoOpt.isEmpty()) {
+                        return Optional.empty();
+                }
 
-        response.setPartidosJugados(jugados);
-        response.setPartidosGanados(ganados);
-        response.setPartidosPerdidos(perdidos);
+                Equipo equipo = equipoOpt.get();
 
-        response.setSetsGanados(setsGanados);
-        response.setSetsPerdidos(setsPerdidos);
+                List<Partido> partidos = partidoRepository
+                                .findPartidosFinalizadosByEquipoIdAndCampeonatoId(
+                                                equipoId,
+                                                campeonatoId);
 
-        response.setPorcentajeVictorias(
-                Math.round(porcentaje * 100.0) / 100.0);
+                long jugados = partidos.size();
 
-        return Optional.of(response);
-    }
+                long ganados = 0;
+                long perdidos = 0;
 
-    public List<EquipoRankingResponse> obtenerRankingPorCampeonato(
-            Long campeonatoId) {
+                long setsGanados = 0;
+                long setsPerdidos = 0;
 
-        return equipoRepository.findAll()
-                .stream()
-                .map(equipo -> obtenerEstadisticasPorCampeonato(
-                        equipo.getId(),
-                        campeonatoId)
-                        .orElseThrow())
-                .filter(estadistica -> estadistica.getPartidosJugados() > 0)
-                .map(estadistica -> {
+                for (Partido partido : partidos) {
 
-                    EquipoRankingResponse ranking = new EquipoRankingResponse();
+                        boolean esEquipoA = partido.getEquipoAEntidad()
+                                        .getId()
+                                        .equals(equipoId);
 
-                    ranking.setEquipoId(
-                            estadistica.getEquipoId());
+                        if (esEquipoA) {
+                                setsGanados += partido.getSetsA();
+                                setsPerdidos += partido.getSetsB();
+                        } else {
+                                setsGanados += partido.getSetsB();
+                                setsPerdidos += partido.getSetsA();
+                        }
 
-                    ranking.setNombre(
-                            estadistica.getNombre());
+                        if (partido.getEquipoGanador() == null) {
+                                continue;
+                        }
 
-                    ranking.setLogoUrl(
-                            estadistica.getLogoUrl());
+                        if (partido.getEquipoGanador()
+                                        .getId()
+                                        .equals(equipoId)) {
 
-                    ranking.setPartidosJugados(
-                            estadistica.getPartidosJugados());
+                                ganados++;
+                        } else {
+                                perdidos++;
+                        }
+                }
 
-                    ranking.setPartidosGanados(
-                            estadistica.getPartidosGanados());
+                double porcentaje = jugados == 0
+                                ? 0
+                                : (ganados * 100.0) / jugados;
 
-                    ranking.setPartidosPerdidos(
-                            estadistica.getPartidosPerdidos());
+                EquipoEstadisticaResponse response = new EquipoEstadisticaResponse();
 
-                    ranking.setSetsGanados(
-                            estadistica.getSetsGanados());
+                response.setEquipoId(equipo.getId());
+                response.setNombre(equipo.getNombre());
+                response.setLogoUrl(equipo.getLogoUrl());
 
-                    ranking.setSetsPerdidos(
-                            estadistica.getSetsPerdidos());
+                response.setPartidosJugados(jugados);
+                response.setPartidosGanados(ganados);
+                response.setPartidosPerdidos(perdidos);
 
-                    ranking.setPorcentajeVictorias(
-                            estadistica.getPorcentajeVictorias());
+                response.setSetsGanados(setsGanados);
+                response.setSetsPerdidos(setsPerdidos);
 
-                    ranking.setPuntaje(
-                            estadistica.getPartidosGanados() * 3);
+                response.setPorcentajeVictorias(
+                                Math.round(porcentaje * 100.0) / 100.0);
 
-                    return ranking;
-                })
-                .sorted(
-                        Comparator
-                                .comparingLong(
-                                        EquipoRankingResponse::getPuntaje)
-                                .reversed()
-                                .thenComparing(
-                                        Comparator.comparingLong(
-                                                EquipoRankingResponse::getSetsGanados)
-                                                .reversed()))
-                .toList();
-    }
+                return Optional.of(response);
+        }
+
+        public List<EquipoRankingResponse> obtenerRankingPorCampeonato(
+                        Long campeonatoId) {
+
+                return equipoRepository.findAll()
+                                .stream()
+                                .map(equipo -> Map.entry(
+                                                equipo,
+                                                obtenerEstadisticasPorCampeonato(
+                                                                equipo.getId(),
+                                                                campeonatoId)
+                                                                .orElseThrow()))
+                                .filter(entry -> entry.getValue().getPartidosJugados() > 0)
+                                .map(entry -> {
+
+                                        Equipo equipo = entry.getKey();
+                                        EquipoEstadisticaResponse estadistica = entry.getValue();
+
+                                        EquipoRankingResponse ranking = new EquipoRankingResponse();
+
+                                        ranking.setEquipoId(estadistica.getEquipoId());
+                                        ranking.setNombre(estadistica.getNombre());
+                                        ranking.setLogoUrl(estadistica.getLogoUrl());
+                                        ranking.setPartidosJugados(estadistica.getPartidosJugados());
+                                        ranking.setPartidosGanados(estadistica.getPartidosGanados());
+                                        ranking.setPartidosPerdidos(estadistica.getPartidosPerdidos());
+                                        ranking.setSetsGanados(estadistica.getSetsGanados());
+                                        ranking.setSetsPerdidos(estadistica.getSetsPerdidos());
+                                        ranking.setPorcentajeVictorias(estadistica.getPorcentajeVictorias());
+                                        ranking.setPuntaje(estadistica.getPartidosGanados() * 3);
+
+                                        // === NUEVO: dirigente ===
+                                        var dirigente = equipo.getDirigente();
+                                        if (dirigente != null) {
+                                                ranking.setDirigenteId(dirigente.getId());
+                                                ranking.setDirigenteNombre(dirigente.getNombre());
+                                                ranking.setDirigenteTelefono(dirigente.getTelefono());
+                                                ranking.setDirigenteFotoUrl(dirigente.getFotoUrl());
+                                        }
+
+                                        return ranking;
+                                })
+                                .sorted(
+                                                Comparator
+                                                                .comparingLong(EquipoRankingResponse::getPuntaje)
+                                                                .reversed()
+                                                                .thenComparing(
+                                                                                Comparator.comparingLong(
+                                                                                                EquipoRankingResponse::getSetsGanados)
+                                                                                                .reversed()))
+                                .toList();
+        }
 }
