@@ -1,9 +1,12 @@
 package com.spe.ecuavoley.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Comparator;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.spe.ecuavoley.dto.JugadorEstadisticaResponse;
@@ -19,6 +22,9 @@ import com.spe.ecuavoley.repository.PartidoRepository;
 
 @Service
 public class EstadisticaJugadorService {
+
+    private static final Logger logger = LoggerFactory
+            .getLogger(EstadisticaJugadorService.class);
 
     private final JugadorRepository jugadorRepository;
     private final PartidoJugadorRepository partidoJugadorRepository;
@@ -121,48 +127,69 @@ public class EstadisticaJugadorService {
 
     public List<JugadorRankingResponse> obtenerRanking() {
 
-        return jugadorRepository.findAll()
+        // Recorremos jugador por jugador (en lugar de un
+        // stream().map() que aborta TODA la lista si un solo
+        // jugador falla) para que un registro problemático de
+        // un jugador (por ejemplo, de un partido suelto/antiguo
+        // fuera de campeonato) no tumbe el ranking global
+        // completo. Ese jugador simplemente se omite y se
+        // registra en el log.
+        List<JugadorRankingResponse> resultado = new ArrayList<>();
+
+        for (Jugador jugador : jugadorRepository.findAll()) {
+
+            try {
+
+                JugadorEstadisticaResponse estadistica = obtenerEstadisticas(
+                        jugador.getId())
+                        .orElseThrow();
+
+                JugadorRankingResponse ranking = new JugadorRankingResponse();
+
+                ranking.setJugadorId(
+                        estadistica.getJugadorId());
+
+                ranking.setNombre(
+                        estadistica.getNombre());
+
+                ranking.setApodo(
+                        estadistica.getApodo());
+
+                ranking.setPartidosJugados(
+                        estadistica.getPartidosJugados());
+
+                ranking.setPartidosGanados(
+                        estadistica.getPartidosGanados());
+
+                ranking.setMvp(
+                        estadistica.getMvp());
+
+                ranking.setPorcentajeVictorias(
+                        estadistica.getPorcentajeVictorias());
+
+                ranking.setFotoUrl(
+                        estadistica.getFotoUrl());
+
+                long puntaje = estadistica.getPartidosGanados() * 3
+                        +
+                        estadistica.getMvp() * 2;
+
+                ranking.setPuntaje(puntaje);
+
+                resultado.add(ranking);
+
+            } catch (Exception excepcion) {
+
+                logger.warn(
+                        "No se pudo calcular el ranking global "
+                                + "para el jugador con id {}: {}",
+                        jugador.getId(),
+                        excepcion.getMessage());
+            }
+        }
+
+        return resultado
                 .stream()
-                .map(jugador -> {
-
-                    JugadorEstadisticaResponse estadistica = obtenerEstadisticas(
-                            jugador.getId())
-                            .orElseThrow();
-
-                    JugadorRankingResponse ranking = new JugadorRankingResponse();
-
-                    ranking.setJugadorId(
-                            estadistica.getJugadorId());
-
-                    ranking.setNombre(
-                            estadistica.getNombre());
-
-                    ranking.setApodo(
-                            estadistica.getApodo());
-
-                    ranking.setPartidosJugados(
-                            estadistica.getPartidosJugados());
-
-                    ranking.setPartidosGanados(
-                            estadistica.getPartidosGanados());
-
-                    ranking.setMvp(
-                            estadistica.getMvp());
-
-                    ranking.setPorcentajeVictorias(
-                            estadistica.getPorcentajeVictorias());
-
-                    ranking.setFotoUrl(
-                            estadistica.getFotoUrl());
-
-                    long puntaje = estadistica.getPartidosGanados() * 3
-                            +
-                            estadistica.getMvp() * 2;
-
-                    ranking.setPuntaje(puntaje);
-
-                    return ranking;
-                })
                 .sorted(
                         Comparator
                                 .comparingLong(

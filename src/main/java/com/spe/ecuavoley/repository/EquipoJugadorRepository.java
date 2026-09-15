@@ -17,4 +17,10 @@ public interface EquipoJugadorRepository
             Long campeonatoId,
             Long equipoId,
             Long jugadorId);
+
+    // Nómina de un equipo a través de todos los campeonatos, usada
+    // por la pantalla de rankings global (fuera de un campeonato
+    // específico), donde no hay un campeonatoId para filtrar.
+    List<EquipoJugador> findByEquipoId(
+            Long equipoId);
 }

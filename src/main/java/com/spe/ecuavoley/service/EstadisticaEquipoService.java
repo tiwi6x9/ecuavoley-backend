@@ -1,10 +1,13 @@
 package com.spe.ecuavoley.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Comparator;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.spe.ecuavoley.dto.EquipoEstadisticaResponse;
@@ -17,6 +20,9 @@ import com.spe.ecuavoley.repository.PartidoRepository;
 
 @Service
 public class EstadisticaEquipoService {
+
+        private static final Logger logger = LoggerFactory
+                        .getLogger(EstadisticaEquipoService.class);
 
         private final EquipoRepository equipoRepository;
         private final PartidoRepository partidoRepository;
@@ -115,40 +121,61 @@ public class EstadisticaEquipoService {
 
         public List<EquipoRankingResponse> obtenerRanking() {
 
-                return equipoRepository.findAll()
+                // Recorremos equipo por equipo (en lugar de un
+                // stream().map() que aborta TODA la lista si un solo
+                // equipo falla) para que un registro problemático de
+                // un equipo (por ejemplo, de un partido suelto/antiguo
+                // fuera de campeonato) no tumbe el ranking global
+                // completo. Ese equipo simplemente se omite y se
+                // registra en el log.
+                List<EquipoRankingResponse> resultado = new ArrayList<>();
+
+                for (Equipo equipo : equipoRepository.findAll()) {
+
+                        try {
+
+                                EquipoEstadisticaResponse estadistica = obtenerEstadisticas(
+                                                equipo.getId())
+                                                .orElseThrow();
+
+                                EquipoRankingResponse ranking = new EquipoRankingResponse();
+
+                                ranking.setEquipoId(estadistica.getEquipoId());
+                                ranking.setNombre(estadistica.getNombre());
+                                ranking.setPartidosJugados(estadistica.getPartidosJugados());
+                                ranking.setPartidosGanados(estadistica.getPartidosGanados());
+                                ranking.setPartidosPerdidos(estadistica.getPartidosPerdidos());
+                                ranking.setSetsGanados(estadistica.getSetsGanados());
+                                ranking.setSetsPerdidos(estadistica.getSetsPerdidos());
+                                ranking.setPorcentajeVictorias(estadistica.getPorcentajeVictorias());
+                                ranking.setLogoUrl(estadistica.getLogoUrl());
+
+                                // === NUEVO: dirigente ===
+                                var dirigente = equipo.getDirigente();
+                                if (dirigente != null) {
+                                        ranking.setDirigenteId(dirigente.getId());
+                                        ranking.setDirigenteNombre(dirigente.getNombre());
+                                        ranking.setDirigenteTelefono(dirigente.getTelefono());
+                                        ranking.setDirigenteFotoUrl(dirigente.getFotoUrl());
+                                }
+
+                                long puntaje = estadistica.getPartidosGanados() * 3;
+                                ranking.setPuntaje(puntaje);
+
+                                resultado.add(ranking);
+
+                        } catch (Exception excepcion) {
+
+                                logger.warn(
+                                                "No se pudo calcular el ranking global "
+                                                                + "para el equipo con id {}: {}",
+                                                equipo.getId(),
+                                                excepcion.getMessage());
+                        }
+                }
+
+                return resultado
                                 .stream()
-                                .map(equipo -> {
-
-                                        EquipoEstadisticaResponse estadistica = obtenerEstadisticas(
-                                                        equipo.getId())
-                                                        .orElseThrow();
-
-                                        EquipoRankingResponse ranking = new EquipoRankingResponse();
-
-                                        ranking.setEquipoId(estadistica.getEquipoId());
-                                        ranking.setNombre(estadistica.getNombre());
-                                        ranking.setPartidosJugados(estadistica.getPartidosJugados());
-                                        ranking.setPartidosGanados(estadistica.getPartidosGanados());
-                                        ranking.setPartidosPerdidos(estadistica.getPartidosPerdidos());
-                                        ranking.setSetsGanados(estadistica.getSetsGanados());
-                                        ranking.setSetsPerdidos(estadistica.getSetsPerdidos());
-                                        ranking.setPorcentajeVictorias(estadistica.getPorcentajeVictorias());
-                                        ranking.setLogoUrl(estadistica.getLogoUrl());
-
-                                        // === NUEVO: dirigente ===
-                                        var dirigente = equipo.getDirigente();
-                                        if (dirigente != null) {
-                                                ranking.setDirigenteId(dirigente.getId());
-                                                ranking.setDirigenteNombre(dirigente.getNombre());
-                                                ranking.setDirigenteTelefono(dirigente.getTelefono());
-                                                ranking.setDirigenteFotoUrl(dirigente.getFotoUrl());
-                                        }
-
-                                        long puntaje = estadistica.getPartidosGanados() * 3;
-                                        ranking.setPuntaje(puntaje);
-
-                                        return ranking;
-                                })
                                 .sorted(
                                                 Comparator
                                                                 .comparingLong(EquipoRankingResponse::getPuntaje)
