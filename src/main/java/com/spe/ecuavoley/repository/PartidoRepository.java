@@ -19,6 +19,9 @@ public interface PartidoRepository extends JpaRepository<Partido, Long> {
     long countByMvpJugadorId(
             Long jugadorId);
 
+    // Ordenado por id descendente (orden de creación, más reciente
+    // primero) para que el historial del perfil de equipo coincida
+    // con el orden real en que se jugaron los partidos.
     @Query("""
             SELECT p
             FROM Partido p
@@ -27,6 +30,7 @@ public interface PartidoRepository extends JpaRepository<Partido, Long> {
                 p.equipoAEntidad.id = :equipoId
                 OR p.equipoBEntidad.id = :equipoId
             )
+            ORDER BY p.id DESC
             """)
     List<Partido> findPartidosFinalizadosByEquipoId(
             @Param("equipoId") Long equipoId);
@@ -44,6 +48,7 @@ public interface PartidoRepository extends JpaRepository<Partido, Long> {
                 p.equipoAEntidad.id = :equipoId
                 OR p.equipoBEntidad.id = :equipoId
             )
+            ORDER BY p.id DESC
             """)
     List<Partido> findPartidosFinalizadosByEquipoIdAndCampeonatoId(
             @Param("equipoId") Long equipoId,
@@ -64,6 +69,12 @@ public interface PartidoRepository extends JpaRepository<Partido, Long> {
             Long campeonatoId,
             EstadoPartido estado);
 
-    List<Partido> findByEstadoOrderByFechaActualizacionDesc(
+    // Se ordena por id (orden de creación) en vez de por
+    // fecha_actualizacion, porque esa fecha se actualiza en cada punto
+    // marcado y no refleja cuándo se creó/jugó el partido: un partido
+    // viejo que recibe una corrección después de otros más nuevos se
+    // subía al tope del historial, dando un orden que no correspondía
+    // a cuándo se jugó realmente.
+    List<Partido> findByEstadoOrderByIdDesc(
             EstadoPartido estado);
 }

@@ -102,6 +102,10 @@ public class EstadisticaEquipoService {
                 response.setSetsPerdidos(setsPerdidos);
                 response.setLogoUrl(equipo.getLogoUrl());
 
+                response.setFoto1Url(equipo.getFoto1Url());
+                response.setFoto2Url(equipo.getFoto2Url());
+                response.setFoto3Url(equipo.getFoto3Url());
+
                 response.setPorcentajeVictorias(
                                 Math.round(porcentaje * 100.0)
                                                 / 100.0);
@@ -293,6 +297,10 @@ public class EstadisticaEquipoService {
                 response.setEquipoId(equipo.getId());
                 response.setNombre(equipo.getNombre());
                 response.setLogoUrl(equipo.getLogoUrl());
+
+                response.setFoto1Url(equipo.getFoto1Url());
+                response.setFoto2Url(equipo.getFoto2Url());
+                response.setFoto3Url(equipo.getFoto3Url());
 
                 response.setPartidosJugados(jugados);
                 response.setPartidosGanados(ganados);

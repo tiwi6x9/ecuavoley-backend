@@ -2,15 +2,29 @@ package com.spe.ecuavoley.dto;
 
 import java.time.LocalTime;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+
 public class CrearPartidoProgramadoRequest {
 
+    @NotNull(message = "campeonatoId es obligatorio")
     private Long campeonatoId;
+
     private Long canchaId;
+
+    @NotNull(message = "equipoAId es obligatorio")
     private Long equipoAId;
+
+    @NotNull(message = "equipoBId es obligatorio")
     private Long equipoBId;
+
+    @Min(value = 1, message = "metaPuntos debe ser mayor a 0")
     private int metaPuntos;
 
     private LocalTime horaProgramada;
+
+    @NotNull(message = "fechaCampeonatoId es obligatorio")
+    private Long fechaCampeonatoId;
 
     public LocalTime getHoraProgramada() {
         return horaProgramada;
@@ -61,8 +75,6 @@ public class CrearPartidoProgramadoRequest {
     public void setMetaPuntos(int metaPuntos) {
         this.metaPuntos = metaPuntos;
     }
-
-    private Long fechaCampeonatoId;
 
     public Long getFechaCampeonatoId() {
         return fechaCampeonatoId;

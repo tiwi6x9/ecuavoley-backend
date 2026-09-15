@@ -12,6 +12,8 @@ import com.spe.ecuavoley.dto.SeleccionarMvpRequest;
 import com.spe.ecuavoley.service.AdminAuthService;
 import com.spe.ecuavoley.service.PartidoJugadorService;
 
+import jakarta.validation.Valid;
+
 
 @RestController
 @RequestMapping("/api/partidos")
@@ -33,7 +35,7 @@ public class PartidoJugadorController {
     public ResponseEntity<Void> seleccionarJugadores(
             @PathVariable Long partidoId,
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
-            @RequestBody SeleccionarJugadoresPartidoRequest request) {
+            @Valid @RequestBody SeleccionarJugadoresPartidoRequest request) {
 
         if (!esAdministrador(authorization)) {
             return ResponseEntity
@@ -84,7 +86,7 @@ public class PartidoJugadorController {
     public ResponseEntity<Void> seleccionarMvp(
             @PathVariable Long partidoId,
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
-            @RequestBody SeleccionarMvpRequest request) {
+            @Valid @RequestBody SeleccionarMvpRequest request) {
 
         if (!esAdministrador(authorization)) {
             return ResponseEntity

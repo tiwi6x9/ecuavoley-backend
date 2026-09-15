@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.spe.ecuavoley.dto.ActualizarEstadoPartidoRequest;
+import com.spe.ecuavoley.dto.CrearPartidoRequest;
 import com.spe.ecuavoley.model.EstadoPartido;
 import com.spe.ecuavoley.model.FechaCampeonato;
 import com.spe.ecuavoley.model.Partido;
@@ -65,7 +66,28 @@ public class PartidoService {
                                 .toList();
         }
 
-        public Partido crearPartido(Partido partido) {
+        /**
+         * Crea un partido "libre" (sin campeonato), a partir unicamente
+         * de los campos que la app permite configurar. El resto del
+         * estado inicial (puntos, sets, estado EN_JUEGO, etc.) lo fija
+         * el servidor, nunca el cliente.
+         */
+        public Partido crearPartido(CrearPartidoRequest request) {
+
+                Partido partido = new Partido();
+
+                partido.setEquipoA(request.getEquipoA());
+                partido.setEquipoB(request.getEquipoB());
+                partido.setMetaPuntos(request.getMetaPuntos());
+
+                partido.setPuntosA(0);
+                partido.setPuntosB(0);
+                partido.setSetsA(0);
+                partido.setSetsB(0);
+                partido.setSetActual(1);
+                partido.setEquipoCambio("A");
+                partido.setEstado(EstadoPartido.EN_JUEGO);
+
                 return partidoRepository.save(partido);
         }
 
@@ -335,6 +357,15 @@ public class PartidoService {
                                                         .getFechaCampeonato()
                                                         .getNumero());
 
+                        // Antes no se llenaba este campo y la fecha real del
+                        // partido nunca llegaba a la app (solo se veía el
+                        // numero de fecha/fase). Se agrega para que la
+                        // audiencia vea la fecha calendario correcta.
+                        response.setFecha(
+                                        partido
+                                                        .getFechaCampeonato()
+                                                        .getFecha());
+
                         response.setFase(
                                         partido
                                                         .getFechaCampeonato()
@@ -347,6 +378,11 @@ public class PartidoService {
                                         partido
                                                         .getEquipoAEntidad()
                                                         .getId());
+
+                        response.setEquipoALogoUrl(
+                                        partido
+                                                        .getEquipoAEntidad()
+                                                        .getLogoUrl());
                 }
 
                 if (partido.getEquipoBEntidad() != null) {
@@ -354,6 +390,11 @@ public class PartidoService {
                                         partido
                                                         .getEquipoBEntidad()
                                                         .getId());
+
+                        response.setEquipoBLogoUrl(
+                                        partido
+                                                        .getEquipoBEntidad()
+                                                        .getLogoUrl());
                 }
 
                 if (partido.getCancha() != null) {
@@ -369,7 +410,7 @@ public class PartidoService {
         public List<HistorialPartidoResponse> obtenerHistorial() {
 
                 return partidoRepository
-                                .findByEstadoOrderByFechaActualizacionDesc(
+                                .findByEstadoOrderByIdDesc(
                                                 EstadoPartido.FINALIZADO)
                                 .stream()
                                 .map(this::convertirAHistorial)

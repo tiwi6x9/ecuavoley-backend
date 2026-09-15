@@ -1,6 +1,7 @@
 package com.spe.ecuavoley.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "dirigentes")
@@ -10,6 +11,7 @@ public class Dirigente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "El nombre es obligatorio")
     @Column(nullable = false)
     private String nombre;
 

@@ -10,6 +10,8 @@ import com.spe.ecuavoley.model.Dirigente;
 import com.spe.ecuavoley.repository.DirigenteRepository;
 import com.spe.ecuavoley.service.AdminAuthService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/dirigentes")
 public class DirigenteController {
@@ -51,7 +53,7 @@ public class DirigenteController {
     @PostMapping
     public ResponseEntity<Dirigente> crear(
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
-            @RequestBody Dirigente dirigente) {
+            @Valid @RequestBody Dirigente dirigente) {
 
         if (!esAdministrador(authorization)) {
             return ResponseEntity
@@ -68,7 +70,7 @@ public class DirigenteController {
     public ResponseEntity<Dirigente> actualizar(
             @PathVariable Long id,
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
-            @RequestBody Dirigente datos) {
+            @Valid @RequestBody Dirigente datos) {
 
         if (!esAdministrador(authorization)) {
             return ResponseEntity

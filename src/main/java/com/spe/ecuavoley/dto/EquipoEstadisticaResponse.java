@@ -13,6 +13,10 @@ public class EquipoEstadisticaResponse {
     private long setsPerdidos;
     private String logoUrl;
 
+    private String foto1Url;
+    private String foto2Url;
+    private String foto3Url;
+
     private double porcentajeVictorias;
 
     public EquipoEstadisticaResponse() {
@@ -90,5 +94,29 @@ public class EquipoEstadisticaResponse {
 
     public void setLogoUrl(String logoUrl) {
         this.logoUrl = logoUrl;
+    }
+
+    public String getFoto1Url() {
+        return foto1Url;
+    }
+
+    public void setFoto1Url(String foto1Url) {
+        this.foto1Url = foto1Url;
+    }
+
+    public String getFoto2Url() {
+        return foto2Url;
+    }
+
+    public void setFoto2Url(String foto2Url) {
+        this.foto2Url = foto2Url;
+    }
+
+    public String getFoto3Url() {
+        return foto3Url;
+    }
+
+    public void setFoto3Url(String foto3Url) {
+        this.foto3Url = foto3Url;
     }
 }

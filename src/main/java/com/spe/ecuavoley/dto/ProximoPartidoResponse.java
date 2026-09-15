@@ -17,9 +17,11 @@ public class ProximoPartidoResponse {
 
     private Long equipoAId;
     private String equipoA;
+    private String equipoALogoUrl;
 
     private Long equipoBId;
     private String equipoB;
+    private String equipoBLogoUrl;
 
     private String canchaNombre;
     private String fase;
@@ -97,6 +99,14 @@ public class ProximoPartidoResponse {
         this.equipoA = equipoA;
     }
 
+    public String getEquipoALogoUrl() {
+        return equipoALogoUrl;
+    }
+
+    public void setEquipoALogoUrl(String equipoALogoUrl) {
+        this.equipoALogoUrl = equipoALogoUrl;
+    }
+
     public Long getEquipoBId() {
         return equipoBId;
     }
@@ -111,6 +121,14 @@ public class ProximoPartidoResponse {
 
     public void setEquipoB(String equipoB) {
         this.equipoB = equipoB;
+    }
+
+    public String getEquipoBLogoUrl() {
+        return equipoBLogoUrl;
+    }
+
+    public void setEquipoBLogoUrl(String equipoBLogoUrl) {
+        this.equipoBLogoUrl = equipoBLogoUrl;
     }
 
     public String getCanchaNombre() {

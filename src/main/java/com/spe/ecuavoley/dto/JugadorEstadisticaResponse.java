@@ -14,6 +14,10 @@ public class JugadorEstadisticaResponse {
     private double porcentajeVictorias;
     private String fotoUrl;
 
+    private String foto1Url;
+    private String foto2Url;
+    private String foto3Url;
+
     public String getFotoUrl() {
         return fotoUrl;
     }
@@ -89,5 +93,29 @@ public class JugadorEstadisticaResponse {
             double porcentajeVictorias) {
 
         this.porcentajeVictorias = porcentajeVictorias;
+    }
+
+    public String getFoto1Url() {
+        return foto1Url;
+    }
+
+    public void setFoto1Url(String foto1Url) {
+        this.foto1Url = foto1Url;
+    }
+
+    public String getFoto2Url() {
+        return foto2Url;
+    }
+
+    public void setFoto2Url(String foto2Url) {
+        this.foto2Url = foto2Url;
+    }
+
+    public String getFoto3Url() {
+        return foto3Url;
+    }
+
+    public void setFoto3Url(String foto3Url) {
+        this.foto3Url = foto3Url;
     }
 }

@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
@@ -22,7 +24,7 @@ public class AdminController {
 
     @PostMapping("/login")
     public ResponseEntity<AdminLoginResponse> login(
-            @RequestBody AdminLoginRequest request) {
+            @Valid @RequestBody AdminLoginRequest request) {
 
         String token = adminAuthService.login(
                 request.getCodigo());

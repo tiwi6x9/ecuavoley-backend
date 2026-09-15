@@ -1,6 +1,7 @@
 package com.spe.ecuavoley.controller;
 
 import com.spe.ecuavoley.dto.ActualizarEstadoPartidoRequest;
+import com.spe.ecuavoley.dto.CrearPartidoRequest;
 import com.spe.ecuavoley.model.Partido;
 import com.spe.ecuavoley.service.AdminAuthService;
 import com.spe.ecuavoley.service.PartidoService;
@@ -16,6 +17,8 @@ import com.spe.ecuavoley.dto.HistorialPartidoResponse;
 import com.spe.ecuavoley.dto.PartidoEnVivoResponse;
 import com.spe.ecuavoley.dto.ProximoPartidoResponse;
 import com.spe.ecuavoley.dto.ResultadoPartidoResponse;
+
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -44,7 +47,7 @@ public class PartidoController {
         @PostMapping
         public ResponseEntity<Partido> crearPartido(
                         @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
-                        @RequestBody Partido partido) {
+                        @Valid @RequestBody CrearPartidoRequest request) {
 
                 if (!esAdministrador(authorization)) {
                         return ResponseEntity
@@ -52,7 +55,7 @@ public class PartidoController {
                                         .build();
                 }
 
-                Partido partidoCreado = partidoService.crearPartido(partido);
+                Partido partidoCreado = partidoService.crearPartido(request);
 
                 return ResponseEntity.ok(partidoCreado);
         }
@@ -61,7 +64,7 @@ public class PartidoController {
         public ResponseEntity<Partido> actualizarEstado(
                         @PathVariable Long id,
                         @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
-                        @RequestBody ActualizarEstadoPartidoRequest request) {
+                        @Valid @RequestBody ActualizarEstadoPartidoRequest request) {
 
                 if (!esAdministrador(authorization)) {
                         return ResponseEntity
@@ -129,7 +132,7 @@ public class PartidoController {
         @PostMapping("/programados")
         public ResponseEntity<Partido> crearPartidoProgramado(
                         @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
-                        @RequestBody CrearPartidoProgramadoRequest request) {
+                        @Valid @RequestBody CrearPartidoProgramadoRequest request) {
 
                 if (!esAdministrador(authorization)) {
                         return ResponseEntity

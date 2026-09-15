@@ -103,6 +103,10 @@ public class EstadisticaJugadorService {
         response.setApodo(jugador.getApodo());
         response.setFotoUrl(jugador.getFotoUrl());
 
+        response.setFoto1Url(jugador.getFoto1Url());
+        response.setFoto2Url(jugador.getFoto2Url());
+        response.setFoto3Url(jugador.getFoto3Url());
+
         response.setPartidosJugados(jugados);
         response.setPartidosGanados(ganados);
         response.setPartidosPerdidos(perdidos);
@@ -183,6 +187,16 @@ public class EstadisticaJugadorService {
                 .filter(participacion -> participacion
                         .getPartido()
                         .getEstado() == EstadoPartido.FINALIZADO)
+                // Orden por id de partido descendente (orden de
+                // creación, más reciente primero), igual que en el
+                // resto del historial: la fecha de actualización no
+                // refleja cuándo se jugó el partido.
+                .sorted(
+                        Comparator.comparingLong(
+                                (PartidoJugador participacion) -> participacion
+                                        .getPartido()
+                                        .getId())
+                                .reversed())
                 .map(participacion -> {
 
                     Partido partido = participacion.getPartido();
@@ -325,6 +339,10 @@ public class EstadisticaJugadorService {
         response.setNombre(jugador.getNombre());
         response.setApodo(jugador.getApodo());
         response.setFotoUrl(jugador.getFotoUrl());
+
+        response.setFoto1Url(jugador.getFoto1Url());
+        response.setFoto2Url(jugador.getFoto2Url());
+        response.setFoto3Url(jugador.getFoto3Url());
 
         response.setPartidosJugados(jugados);
         response.setPartidosGanados(ganados);
